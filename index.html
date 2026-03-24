@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASCII CAM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <div id="vp">
+    <div id="topbar">
+      <span class="wordmark">ASCII CAM</span>
+      <div class="hud">
+        <span id="h-fps">-- FPS</span>
+        <span id="h-res">-- × --</span>
+        <span id="h-mode">DETAIL</span>
+      </div>
+    </div>
+    <div id="rec"><div id="recdot"></div>LIVE</div>
+    <div id="freeze-badge">⏸ FREEZE</div>
+    <canvas id="rain-effect"></canvas>
+    <canvas id="display"></canvas>
+
+    <div id="overlay">
+      <div class="ol-eye">Realtime renderer</div>
+      <div class="ol-h">ASCII<span>CAM</span></div>
+      <div class="ol-line"></div>
+      <div class="ol-sub">Converts your webcam into dense ASCII art in real time</div>
+      <button id="go">Initialize Camera</button>
+      <div class="ol-note">CAMERA PERMISSION REQUIRED</div>
+    </div>
+  </div>
+
+  <div id="sb">
+    <div class="sb-head">
+      <span class="sb-title">CONTROLS</span>
+      <span class="vtag">v3.0</span>
+    </div>
+
+    <!-- CHARACTER SET -->
+    <div class="sec">
+      <div class="sec-lbl">Character Set</div>
+      <div class="chips" id="charset-chips">
+        <button class="chip" data-cs="ultra">ULTRA</button>
+        <button class="chip on" data-cs="detail">DETAIL</button>
+        <button class="chip" data-cs="std">STD</button>
+        <button class="chip" data-cs="minimal">MINIMAL</button>
+        <button class="chip" data-cs="blocks">BLOCKS</button>
+        <button class="chip" data-cs="braille">BRAILLE</button>
+        <button class="chip" data-cs="matrix">MATRIX</button>
+        <button class="chip" data-cs="hex">HEX</button>
+      </div>
+    </div>
+
+    <!-- DENSITY -->
+    <div class="sec">
+      <div class="sec-lbl">Density &amp; Scale</div>
+      <div class="sr">
+        <div class="sh"><span class="sn">Columns</span><span class="sv" id="v-cols">220</span></div>
+        <input type="range" min="60" max="400" value="220" id="cols-slider">
+      </div>
+      <div class="sr">
+        <div class="sh"><span class="sn">Zoom</span><span class="sv" id="v-zoom">1.0×</span></div>
+        <input type="range" min="50" max="300" value="100" id="zoom-slider">
+      </div>
+    </div>
+
+    <!-- COLOR -->
+    <div class="sec">
+      <div class="sec-lbl">Color Tone</div>
+      <div class="swatches" id="color-swatches">
+        <button class="sw on"  style="background:#e0e0e0" data-color="white"  title="White"></button>
+        <button class="sw"     style="background:#00ff87" data-color="green"  title="Green"></button>
+        <button class="sw"     style="background:#e8ff47" data-color="acid"   title="Acid"></button>
+        <button class="sw"     style="background:#ff9f43" data-color="amber"  title="Amber"></button>
+        <button class="sw"     style="background:#00d2ff" data-color="cyan"   title="Cyan"></button>
+        <button class="sw"     style="background:#ff6b9d" data-color="pink"   title="Pink"></button>
+        <button class="sw"     style="background:#a29bfe" data-color="violet" title="Violet"></button>
+        <button class="sw"     style="background:#fd79a8" data-color="rose"   title="Rose"></button>
+      </div>
+    </div>
+
+    <!-- IMAGE ADJUSTMENTS -->
+    <div class="sec">
+      <div class="sec-lbl">Image</div>
+      <div class="sr">
+        <div class="sh"><span class="sn">Brightness</span><span class="sv" id="v-br">0</span></div>
+        <input type="range" min="-100" max="100" value="0" id="br-slider">
+      </div>
+      <div class="sr">
+        <div class="sh"><span class="sn">Contrast</span><span class="sv" id="v-ct">1.0×</span></div>
+        <input type="range" min="50" max="250" value="100" id="ct-slider">
+      </div>
+      <div class="sr">
+        <div class="sh"><span class="sn">Gamma</span><span class="sv" id="v-gm">1.0</span></div>
+        <input type="range" min="40" max="250" value="100" id="gamma-slider">
+      </div>
+      <div class="sr">
+        <div class="sh"><span class="sn">Sharpen</span><span class="sv" id="v-sh">0</span></div>
+        <input type="range" min="0" max="100" value="0" id="sharpen-slider">
+      </div>
+    </div>
+
+    <!-- EFFECTS -->
+    <div class="sec">
+      <div class="sec-lbl">Effects</div>
+      <div class="fx-chips" id="fx-chips">
+        <button class="chip" data-fx="edge">EDGE</button>
+        <button class="chip" data-fx="scanline">SCANLINES</button>
+        <button class="chip" data-fx="glitch">GLITCH</button>
+        <button class="chip" data-fx="pixelate">PIXELATE</button>
+        <button class="chip" data-fx="thermal">THERMAL</button>
+        <button class="chip" data-fx="ghost">GHOST</button>
+        <button class="chip" data-fx="rain">RAIN</button>
+      </div>
+    </div>
+
+    <!-- OPTIONS -->
+    <div class="sec" id="options-sec">
+      <div class="sec-lbl">Options</div>
+      <div class="tr">
+        <div class="tl">Mirror<small>Flip horizontally</small></div>
+        <button class="tog on" data-opt="mirror"></button>
+      </div>
+      <div class="tr">
+        <div class="tl">Invert<small>Swap light / dark</small></div>
+        <button class="tog" data-opt="invert"></button>
+      </div>
+      <div class="tr">
+        <div class="tl">Full Color<small>RGB per character</small></div>
+        <button class="tog" data-opt="colorMode"></button>
+      </div>
+      <div class="tr">
+        <div class="tl">Light Background<small>White bg for sharing</small></div>
+        <button class="tog" data-opt="lightBg"></button>
+      </div>
+      <div class="tr">
+        <div class="tl">Bold Chars<small>Heavier weight</small></div>
+        <button class="tog" data-opt="bold"></button>
+      </div>
+    </div>
+
+    <!-- EXPORT / ACTIONS -->
+    <div class="sec">
+      <div class="sec-lbl">Actions</div>
+      <button class="abtn freeze-btn" id="freeze-btn">⏸ Freeze Frame</button>
+      <button class="abtn prim" id="snap-dark">Save Screenshot</button>
+      <button class="abtn share" id="snap-share">💬 Save for Sharing</button>
+      <button class="abtn" id="copy-text">Copy ASCII Text</button>
+    </div>
+
+    <!-- LIVE STATS -->
+    <div id="info">
+      <div class="ic"><span class="iv" id="i-fps">--</span><span class="ik">FPS</span></div>
+      <div class="ic"><span class="iv" id="i-cols">--</span><span class="ik">Cols</span></div>
+      <div class="ic"><span class="iv" id="i-rows">--</span><span class="ik">Rows</span></div>
+      <div class="ic"><span class="iv" id="i-chars">--</span><span class="ik">Chars</span></div>
+    </div>
+  </div>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>
